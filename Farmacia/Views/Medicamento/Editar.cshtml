@@ -1,0 +1,31 @@
+@using Medicamentos.Models
+@model MedicamentoViewModel
+
+<h2>Editar Medicamento</h2>
+
+<form asp-controller="Medicamento" asp-action="Editar" method="POST">
+    <input type="hidden" asp-for="Id" />
+
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" asp-for="Nombre" required><br><br>
+
+    <label for="descripcion">Descripción:</label>
+    <textarea id="descripcion" name="descripcion" asp-for="Descripcion"></textarea><br><br>
+
+    <label for="tipo">Tipo:</label>
+    <input type="text" id="tipo" name="tipo" asp-for="Tipo"><br><br>
+
+    <label for="clasificacion">Clasificación:</label>
+    <input type="text" id="clasificacion" name="clasificacion" asp-for="Clasificacion"><br><br>
+
+    <label for="precio">Precio:</label>
+    <input type="number" id="precio" name="precio" asp-for="Precio" step="0.01" required><br><br>
+
+    <label for="cantidad">Cantidad:</label>
+    <input type="number" id="cantidad" name="cantidad" asp-for="Cantidad" required><br><br>
+
+    <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+    <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" asp-for="fechaVen" required><br><br>
+
+    <input type="submit" value="Guardar cambios">
+</form>

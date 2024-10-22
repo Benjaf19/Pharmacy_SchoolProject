@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulario de Medicamento</title>
+</head>
+<body>
+    <h1>Agregar Medicamento</h1>
+    <form action="/Medicamento/Agregar" method="POST">
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+        <br><br>
+        
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" name="descripcion"></textarea>
+        <br><br>
+        
+        <label for="tipo">Tipo:</label>
+        <input type="text" id="tipo" name="tipo">
+        <br><br>
+        
+        <label for="clasificacion">Clasificación:</label>
+        <input type="text" id="clasificacion" name="clasificacion">
+        <br><br>
+        
+        <label for="precio">Precio:</label>
+        <input type="number" step="0.01" id="precio" name="precio">
+        <br><br>
+        
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" name="cantidad">
+        <br><br>
+        
+        <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+        <input type="date" id="fecha_vencimiento" name="fecha_vencimiento">
+        <br><br>
+        
+        <input type="submit" value="Agregar">
+    </form>
+</body>
+</html>

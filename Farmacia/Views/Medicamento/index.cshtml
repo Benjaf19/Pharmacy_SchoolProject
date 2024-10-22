@@ -1,0 +1,206 @@
+@model System.Data.DataTable
+@{ViewData["Title"]= "Lista de medicamentos";}
+<html>
+<head>
+</head>
+<body>
+    
+@if(@ViewData["Rol"].Equals("Admin")){
+<div class="jumbotron">
+    <h1 class="text-center">@ViewData["Title"]</H1>
+    <div>
+        <table class="datatable" id="miTabla">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nombre</th>
+                    
+                    <th>Descripción</th>
+                    <th>Tipo</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Fecha Ven</th>
+                    <th><a asp-action="Agregar">Crear nueva</a></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(int i=0; i<Model.Rows.Count;i++)
+                {
+                    <tr>
+                        <td>@Model.Rows[i]["nombre"]</td>
+                        
+                        <td>
+                            @Model.Rows[i]["descripcion"]
+                        </td>
+                        <td>
+                            @Model.Rows[i]["tipo"]
+                        </td>
+                        <td>
+                            @Model.Rows[i]["precio"]
+                        </td>
+                        <td>
+                            @Model.Rows[i]["cantidad"]
+                        </td>
+                        <td>
+                            @Model.Rows[i]["fecha_vencimiento"]
+                        </td>
+                        <td>
+                            <a asp-action="Editar" asp-route-id="@Model.Rows[i]["id"]">Editar</a>
+                            <a asp-action="Eliminar" asp-route-id="@Model.Rows[i]["id"]">Eliminar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+ </div>
+}else{
+   <div class="jumbotron">
+    <h1 class="text-center">@ViewData["Title"]</H1>
+    <div>
+        <table class="datatable" id="miTabla">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Tipo</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Fecha Ven</th>
+                    <th>Cantidad a vender</th>
+                </tr>
+            </thead>
+            <tbody>
+                <form asp-controller="Venta" asp-action="Agregar" method="post">
+                @for (int i = 0; i < Model.Rows.Count; i++)
+                {
+                    var id = Model.Rows[i]["id"];
+                    var nombre = Model.Rows[i]["nombre"];
+                    var precio = Model.Rows[i]["precio"];
+                    var cantidad = Model.Rows[i]["cantidad"];
+                    var fechaVencimiento = Model.Rows[i]["fecha_vencimiento"];
+
+                    <tr>
+                        <td>@nombre</td>
+                        <td>@Model.Rows[i]["descripcion"]</td>
+                        <td>@Model.Rows[i]["tipo"]</td>
+                        <td>@precio</td>
+                        <td>@cantidad</td>
+                        <td>@fechaVencimiento</td>
+                        <td>
+                            <input type="number" name="cantidadVenta_@i" id="cantidadVenta_@id" min="1" max="@cantidad" placeholder="0">
+                            <input type="hidden" name="totalVenta_@i" value="@precio">
+                        </td>
+                        
+                    </tr>
+                }
+                <input type="submit" value="Agregar al carrito">
+                </form>
+            </tbody>
+            
+        </table>
+        
+    </div>
+</div>
+
+
+                
+            
+ <script>
+    $(document).ready(function() {
+        // Variables para almacenar los datos del carrito
+        var carrito = [];
+
+        // Función para agregar un producto al carrito
+        function agregarProducto(id, nombre, precio, cantidadDisponible) {
+            // Obtener la cantidad ingresada por el usuario
+            var cantidadVenta = parseInt($('#cantidadVenta_' + id).val());
+
+            // Verificar que la cantidad sea menor o igual a la cantidad disponible
+            if (cantidadVenta <= cantidadDisponible) {
+                // Verificar si el producto ya está en el carrito
+                var productoEnCarrito = carrito.find(function(item) {
+                    return item.id === id;
+                });
+
+                if (productoEnCarrito) {
+                    // Actualizar la cantidad del producto en el carrito
+                    productoEnCarrito.cantidad += cantidadVenta;
+                } else {
+                    // Agregar el producto al carrito
+                    carrito.push({
+                        id: id,
+                        nombre: nombre,
+                        precio: precio,
+                        cantidad: cantidadVenta
+                    });
+                }
+
+                // Actualizar la tabla del carrito
+                actualizarTablaCarrito();
+            } else {
+                alert('La cantidad ingresada supera la disponibilidad del producto.');
+            }
+        }
+
+        // Función para eliminar un producto del carrito
+        function eliminarProducto(id) {
+            // Encontrar el producto en el carrito y eliminarlo
+            carrito = carrito.filter(function(item) {
+                return item.id !== id;
+            });
+
+            // Actualizar la tabla del carrito
+            actualizarTablaCarrito();
+        }
+
+        // Función para actualizar la tabla del carrito
+        function actualizarTablaCarrito() {
+            var tablaCarrito = $('#tablaCarrito');
+            tablaCarrito.empty();
+
+            var total = 0;
+
+            for (var i = 0; i < carrito.length; i++) {
+                var producto = carrito[i];
+
+                var fila = $('<tr>');
+                fila.append($('<td>').text(producto.nombre));
+                fila.append($('<td>').text(producto.precio.toFixed(2)));
+                fila.append($('<td>').text(producto.cantidad));
+                fila.append($('<td>').text((producto.precio * producto.cantidad).toFixed(2)));
+
+                var botonEliminar = $('<button>')
+                    .addClass('btn btn-danger btn-sm')
+                    .text('Eliminar')
+                    .click(function() {
+                        eliminarProducto(producto.id);
+                    });
+
+                fila.append($('<td>').append(botonEliminar));
+
+                tablaCarrito.append(fila);
+
+                total += producto.precio * producto.cantidad;
+            }
+
+            // Actualizar el total
+            $('#total').text(total.toFixed(2));
+        }
+
+        // Evento para agregar un producto al carrito
+        $('.agregarCarrito').click(function() {
+            var id = $(this).data('id');
+            var nombre = $(this).data('nombre');
+            var precio = parseFloat($(this).data('precio'));
+            var cantidadDisponible = parseInt($(this).data('cantidad-disponible'));
+
+            agregarProducto(id, nombre, precio, cantidadDisponible);
+        });
+    });
+</script>
+}
+
+
+ </body>
+ 
+</html>
